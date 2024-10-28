@@ -1,15 +1,18 @@
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:mastring_api/core/api/api_consumer.dart';
+import 'package:mastring_api/core/api/end_points.dart';
+import 'package:mastring_api/core/errors/exptions.dart';
 import 'package:mastring_api/cubit/user_state.dart';
+import 'package:mastring_api/models/signin_model.dart';
 
 class UserCubit extends Cubit<UserState> {
-  UserCubit(this.apiConsumer) : super(UserInitial());
+  UserCubit(this.api) : super(UserInitial());
   //Sign in Form key
-  final ApiConsumer apiConsumer;
+  final ApiConsumer api;
   GlobalKey<FormState> signInFormKey = GlobalKey();
   //Sign in email
   TextEditingController signInEmail = TextEditingController();
@@ -29,20 +32,27 @@ class UserCubit extends Cubit<UserState> {
   TextEditingController signUpPassword = TextEditingController();
   //Sign up confirm password
   TextEditingController confirmPassword = TextEditingController();
-  final Dio dio = Dio();
-  Future<dynamic> signIn() async {
-    emit(LoadingSignin());
+  // Signin model 
+ SigninModel? user;
+
+  signIn() async {
     try {
-      final response = await dio.post(
-          'https://food-api-omega.vercel.app/api/v1/user/signin',
-          data: {'email': signInEmail.text, 'password': signInPassword.text});
-          if (kDebugMode) {
-            print(response);
-          }
+      emit(LoadingSignin());
+      final response = await api.post(
+       EndPoints.signIn,
+        data: {
+          Apikey.email: signInEmail.text,
+          Apikey.password: signInPassword.text,
+        },
+      );
+      user = SigninModel.fromJson(response);
+      // ignore: unused_local_variable
+      final decodedToken = JwtDecoder.decode(user!.token);
+      // ignore: avoid_print
+      // print(decodedToken);
       emit(SucessSignin());
-      return response;
-    } catch (e) {
-      emit(FailureSignin(messageError: e.toString()));
+    } on ServerException catch (e) {
+      emit(FailureSignin(messageError:  e.model.messageError));
     }
   }
 }
