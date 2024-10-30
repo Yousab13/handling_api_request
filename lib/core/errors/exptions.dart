@@ -7,34 +7,22 @@ final ErrorModel model;
   ServerException({required this.model});
 } 
 void handlingDioExption(DioException error) {
+  if (error.response != null && error.response!.data is Map<String, dynamic>) {
+    final errorData = ErrorModel.fromJson(error.response!.data);
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
-        throw ServerException(model: error.response!.data);
       case DioExceptionType.sendTimeout:
-        throw ServerException(model: error.response!.data);
       case DioExceptionType.receiveTimeout:
-        throw ServerException(model: error.response!.data);
       case DioExceptionType.badCertificate:
-        throw ServerException(model: error.response!.data);
       case DioExceptionType.cancel:
-        throw ServerException(model: error.response!.data);
       case DioExceptionType.connectionError:
-        throw ServerException(model: error.response!.data);
       case DioExceptionType.unknown:
-        throw ServerException(model: error.response!.data);
       case DioExceptionType.badResponse:
-        switch (error.response?.statusCode) {
-          case 400:
-            throw ServerException(model: error.response!.data);
-          case 401:
-            throw ServerException(model: error.response!.data);
-          case 403:
-            throw ServerException(model: error.response!.data);
-          case 409:
-            throw ServerException(model: error.response!.data);
-          case 422:
-            throw ServerException(model: error.response!.data);
-          case 504:
-        }
+        throw ServerException(model: errorData);
+      default:
+        throw ServerException(model: ErrorModel(errorMessage: 'Unknown error' ,status: 1));
     }
+  } else {
+    throw ServerException(model: ErrorModel(errorMessage: 'Unknown error occurred' ,status: 1));
   }
+}

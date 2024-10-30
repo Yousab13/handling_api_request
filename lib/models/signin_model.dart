@@ -5,7 +5,7 @@ class SigninModel {
   final String message;
 
   SigninModel({required this.token, required this.message});
-  factory SigninModel.fromJson(Map<String,dynamic>jsonData){
+  factory SigninModel.fromJson(dynamic jsonData){
     return SigninModel
     (
       token: jsonData[Apikey.token] ,message:jsonData[Apikey.message] 

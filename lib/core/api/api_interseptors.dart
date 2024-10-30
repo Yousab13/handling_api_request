@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:mastring_api/cache/cache_helper.dart';
+import 'package:mastring_api/core/api/end_points.dart';
 
 
 class ApiInterceptor extends Interceptor {
@@ -7,7 +9,8 @@ class ApiInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) {
-    options.headers['Accept-Language'] = 'en';
+    options.headers[Apikey.token] !=null?
+  'FOODAPI ${CacheHelper().getData(key: Apikey.token)}':null;
     super.onRequest(options, handler); // Make sure to call super for forwarding
   }
 }
