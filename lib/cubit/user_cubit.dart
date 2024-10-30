@@ -91,8 +91,8 @@ class UserCubit extends Cubit<UserState> {
       emit(GetUserLoading());
       final response = await api
           .get(EndPoints.userid(CacheHelper().getData(key: Apikey.id)));
-          print(response);
-       // emit(GetUserSucess(user: UserModel.fromJson(response)));
+          
+       emit(GetUserSucess(user: UserModel.fromJson(response)));
     } on ServerException catch (e) {
       emit(GetUserFailure(messageError: e.model.errorMessage));
     }
